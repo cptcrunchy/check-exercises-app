@@ -3,6 +3,7 @@ const path = require('path')
 const url = require('url')
 const shell = require('electron').shell
 const ipc = require('electron').ipc
+require('electron-reload')(__dirname)
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
@@ -23,7 +24,9 @@ function createWindow () {
     }))
 
     // Open the DevTools.
-    win.webContents.openDevTools()
+    win.webContents.openDevTools({
+        mode: 'bottom'    
+    })
 
     // Emitted when the window is closed.
     win.on('closed', () => {
