@@ -21,16 +21,16 @@ DOM Animation Variables
 ***********************
 */
 const frames = [{
-    opacity: 0,
-    easing: 'ease-in'
-},
-{
-    opacity: 0.5,
-    easing: 'ease-out'
-},
-{
-    opacity: 1
-},
+        opacity: 0,
+        easing: 'ease-in'
+    },
+    {
+        opacity: 0.5,
+        easing: 'ease-out'
+    },
+    {
+        opacity: 1
+    },
 ]
 
 const options = {
@@ -53,28 +53,32 @@ async function getUserExercises(githubName) {
         `https://api.github.com/repos/${githubName}/codeup-web-exercises/contents/`,
         `https://api.github.com/repos/${githubName}/codeup-web-exercises/contents/css/`,
         `https://api.github.com/repos/${githubName}/codeup-web-exercises/contents/js/`,
-        `https://api.github.com/repos/${githubName}/codeup-java-exercises/contents/`,
     ]
 
     const exerciseRepos = await Promise.all(exerciseURLs.map(async url => {
         let response = await fetch(url)
-            if (response.status == 200) {
-                return await response.json()
-            } else {
-                showErrorMsg(response.statusText)
-            }
+        if (response.status == 200) {
+            return await response.json()
+        } else {
+            showErrorMsg(response.statusText)
         }
-    ))
+    }))
 
     // Filter out files by .extension
-    const htmlFiles = exerciseRepos[0].filter(({ name }) => name.endsWith(".html")).map(file => file.name)
-    const cssFiles = exerciseRepos[1].filter(({ name }) => name.endsWith(".css")).map(file => file.name)
-    const jsFiles = exerciseRepos[2].filter(({ name }) => name.endsWith(".js")).map(file => file.name)
+    const htmlFiles = exerciseRepos[0].filter(({
+        name
+    }) => name.endsWith(".html")).map(file => file.name)
+    const cssFiles = exerciseRepos[1].filter(({
+        name
+    }) => name.endsWith(".css")).map(file => file.name)
+    const jsFiles = exerciseRepos[2].filter(({
+        name
+    }) => name.endsWith(".js")).map(file => file.name)
 
     const allFiles = htmlFiles.concat(cssFiles, jsFiles)
-    
-    // Show the missing exercises
 
+    // Show the missing exercises
+    getMissingExercises(allFiles)
 }
 
 
@@ -115,10 +119,10 @@ function getMissingExercises(exercisesArr) {
 
     // Find missing exercises using ES7 
     // https://stackoverflow.com/questions/1187518/how-to-get-the-difference-between-two-arrays-in-javascript
-    const missingExercises = allExercises.filter(file => !exercises.includes(file))
+    const missingExercises = allExercises.filter(file => !exercisesArr.includes(file))
 
     // Show no missing files if not missing any, else show files
-    
+
     if (missingExercises.length === 0) {
         document.getElementById('get-repo').style.display = "none"
         document.getElementById('no-missing').style.display = "inline-block"
@@ -128,38 +132,39 @@ function getMissingExercises(exercisesArr) {
 
         const missingByExt = []
         filterFiles(missingExercises, missingByExt)
-        showMissing(missingByExt)
+        console.log(missingByExt)
+        displayMissingExercises(missingByExt)
     }
 }
 
-function displayMissingExercises(files){
-    
+function displayMissingExercises(all) {
+
     // Create the div
-        const createExercise = (arr, selector) => {
-            for (let item of arr) {
-                let exerciseHtml = (
-                    '<div class="col-6">' +
-                    '<h5 class="text-center">' + item + '</h5>' +
-                    '</div>'
-                )
-                selector.append(exerciseHtml)
-            }
+    const createExercise = (arr, selector) => {
+        for (let item of arr) {
+            let exerciseHtml = (
+                '<div class="col-6">' +
+                '<h5 class="text-center">' + item + '</h5>' +
+                '</div>'
+            )
+            selector.append(exerciseHtml)
         }
+    }
 
-        const rows = [$('#html'), $('#css'), $('#js'), $('#java'), $('#sql')]
-        const selectors = [$('#html-row:last'), $('#css-row:last'), $('#js-row:last'), $('#java-row:last'), $('#sql-row:last')]
+    const rows = [$('#html'), $('#css'), $('#js'), $('#java'), $('#sql')]
+    const selectors = [$('#html-row:last'), $('#css-row:last'), $('#js-row:last'), $('#java-row:last'), $('#sql-row:last')]
 
-        // Only create div if you have missing items
-        for (let ext of all) {
-            if (ext.length === 0)
-                rows[all.indexOf(ext)].remove()
-            else
-                createExercise(ext, selectors[all.indexOf(ext)])
-        }
+    // Only create div if you have missing items
+    for (let ext of all) {
+        if (all.length === 0)
+            rows[all.indexOf(ext)].remove()
+        else
+            createExercise(ext, selectors[all.indexOf(ext)])
+    }
 
-        // Animations
-        scrollMagic()
-        document.getElementById('arrow').animate({ opacity: 1}, 5000)
+    // Animations
+    scrollMagic()
+    document.getElementById('arrow').animate(frames, options)
 }
 
 // Typed.js
@@ -188,8 +193,8 @@ function scrollMagic() {
     // Add panels to the controller
     for (let slide of slides) {
         new ScrollMagic.Scene({
-            triggerElement: slide
-        })
+                triggerElement: slide
+            })
             .setPin(slide)
             .addTo(controller)
     }
@@ -200,15 +205,15 @@ function scrollMagic() {
 function showErrorMsg(msg) {
 
     const errorMessages = [{
-        id: 1,
-        message: "you didn't enter a github name",
-        type: "empty"
-    },
-    {
-        id: 2,
-        message: "The Github user: " + userNameInput.value + " does not appear to have a codeup-web-exercises repo. Check your username spelling.",
-        type: "Not Found"
-    }
+            id: 1,
+            message: "you didn't enter a github name",
+            type: "empty"
+        },
+        {
+            id: 2,
+            message: "The Github user: " + userNameInput.value + " does not appear to have a codeup-web-exercises repo. Check your username spelling.",
+            type: "Not Found"
+        }
     ]
     errorMessages.map(errMsg => {
         if (msg === errMsg.type) {
@@ -222,32 +227,30 @@ function showErrorMsg(msg) {
     })
 }
 
-window.addEventListener("load", function () {
-    /***************
-    Event Handlers
-    ***************/
-    exercisesBtn.addEventListener('click', function () {
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* Event Handlers*/
+exercisesBtn.addEventListener('click', function () {
+    if (userNameInput.value === '') {
+        showErrorMsg("empty")
+    } else {
+        // Async await function
+        getUserExercises(userNameInput.value)
+    }
+})
+
+userNameInput.addEventListener("keyup", function (event) {
+    if (event.key === "Enter") {
         if (userNameInput.value === '') {
             showErrorMsg("empty")
         } else {
-            // Attempt the ajax request
-            getData(userNameInput.value)
+            // Async await function
+            getUserExercises(userNameInput.value)
         }
-    })
+    }
+})
 
-    userNameInput.addEventListener("keyup", function (event) {
-        if (event.key === "Enter") {
-            if (userNameInput.value === '') {
-                showErrorMsg("empty")
-            } else {
-                // Attempt the ajax request
-                getUserExercises(userNameInput.value)
-            }
-        }
-    })
-    // ********************************************************
-
-    typed()
-
+typed()
 
 })
